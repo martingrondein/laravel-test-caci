@@ -5,9 +5,14 @@ namespace App\Livewire;
 use App\Models\Sales;
 use Livewire\Component;
 use Akaunting\Money\Money;
+use App\Models\Products;
 
 class RecordSale extends Component
 {
+    public $products = [];
+
+    public $product;
+
     public $quantity;
 
     public $unit_cost;
@@ -16,9 +21,24 @@ class RecordSale extends Component
 
     public $selling_price;
 
-    public $profit_margin = 0.25;
+    public $profit_margin = 0.15;
 
     public $shipping_cost = 10;
+
+    public $selectedProduct = null;
+
+
+    /**
+     * Mount the component
+     *
+     * It retrieves all products from the database and assigns them to the $products property.
+     *
+     * @return void
+     */
+    public function mount()
+    {
+        $this->products = Products::all();
+    }
 
     /**
      * Calculates the cost of the sale as the user types
@@ -41,7 +61,7 @@ class RecordSale extends Component
     public function save()
     {
         Sales::create(
-            $this->only(['quantity', 'unit_cost', 'selling_price'])
+            $this->only(['product', 'quantity', 'unit_cost', 'selling_price'])
         );
 
         // Update the Previous Sales component

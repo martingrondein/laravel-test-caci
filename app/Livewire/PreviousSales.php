@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Products;
 use App\Models\Sales;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -9,6 +10,8 @@ use Livewire\Attributes\On;
 class PreviousSales extends Component
 {
     public $sales;
+
+    public $product = Products::class;
 
     /**
      * Update the sales records when a sale is recorded.
@@ -19,6 +22,7 @@ class PreviousSales extends Component
     public function updateRecordSale()
     {
         $this->sales = Sales::all()->reverse();
+        // $this->sales = Sales::with('product')->get();
     }
 
     /**
@@ -29,6 +33,7 @@ class PreviousSales extends Component
      */
     public function mount()
     {
+
         $this->sales = Sales::all()->reverse();
     }
 
@@ -40,6 +45,8 @@ class PreviousSales extends Component
      */
     public function render()
     {
+
+
         return view('livewire.previous-sales');
     }
 }

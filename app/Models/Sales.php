@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Products;
 use Illuminate\Database\Eloquent\Model;
 
 class Sales extends Model
@@ -13,8 +13,21 @@ class Sales extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'product',
         'quantity',
         'unit_cost',
         'selling_price',
     ];
+
+
+    /**
+     * Get the product associated with the sale.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function product()
+    {
+        return $this->belongsTo(Products::class);
+    }
+
 }
