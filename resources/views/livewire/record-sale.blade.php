@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit="save">
+    <form wire:submit.prevent="save">
 
         <div class="flex flex-row ">
             <div class="w-full flex-col-4">
@@ -17,6 +17,9 @@
                 <label for="quantity" class="block text-gray-700">🔢 Quantity</label>
                 <input type="number" wire:model="quantity" id="quantity" name="quantity" min="1" step="1"
                     required class="w-full px-3 py-2 border border-gray-300 rounded-md" wire:input="calculate_cost">
+                @error('quantity')
+                    <div class="text-sm text-red-600 error">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="w-full px-2 flex-col-2 ">
@@ -24,6 +27,9 @@
                 <input type="number" wire:model="unit_cost" id="unit_cost" name="unit_cost" min="0.01"
                     step="0.01" required class="w-full px-3 py-2 border border-gray-300 rounded-md"
                     wire:input="calculate_cost">
+                    @error('unit_cost')
+                    <div class="text-sm text-red-600 error">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="w-full px-2 flex-col-2 ">

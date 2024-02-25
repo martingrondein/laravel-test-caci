@@ -22,7 +22,6 @@ class PreviousSales extends Component
     public function updateRecordSale()
     {
         $this->sales = Sales::all()->reverse();
-        // $this->sales = Sales::with('product')->get();
     }
 
     /**
@@ -33,7 +32,6 @@ class PreviousSales extends Component
      */
     public function mount()
     {
-
         $this->sales = Sales::all()->reverse();
     }
 
@@ -45,8 +43,6 @@ class PreviousSales extends Component
      */
     public function render()
     {
-
-
         return view('livewire.previous-sales');
     }
 }
