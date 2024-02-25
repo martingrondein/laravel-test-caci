@@ -4,21 +4,38 @@ namespace App\Livewire;
 
 use App\Models\Sales;
 use Livewire\Component;
+use App\Models\Products;
 use Akaunting\Money\Money;
+use Akaunting\Money\Currency;
+use Livewire\Attributes\Validate;
 
 class RecordSale extends Component
 {
+    public $products = [];
+
+    public $product;
+
+    #[Validate]
     public $quantity;
 
+    #[Validate]
     public $unit_cost;
 
     public $cost;
 
     public $selling_price;
 
-    public $profit_margin = 0.25;
+    public $profit_margin = 0.15;
 
     public $shipping_cost = 10;
+
+    public function rules()
+    {
+        return [
+            'quantity' => 'required|numeric',
+            'unit_cost' => 'required|numeric|between:0,999.99',
+        ];
+    }
 
     /**
      * Calculates the cost of the sale as the user types
@@ -27,10 +44,11 @@ class RecordSale extends Component
      */
     public function calculate_cost()
     {
-        // If the quantity is not set, default to 1
-        (!$this->quantity) ? $this->quantity = 1 : $this->quantity;
+        (!is_numeric($this->quantity)) ? $this->quantity = 0 : '';
+        (!is_numeric($this->unit_cost)) ? $this->unit_cost = 0 : '';
 
-        $this->cost = $this->quantity * $this->unit_cost;
+        $this->cost = number_format($this->quantity * $this->unit_cost,2);
+
     }
 
     /**
@@ -40,8 +58,10 @@ class RecordSale extends Component
      */
     public function save()
     {
+        $this->validate();
+
         Sales::create(
-            $this->only(['quantity', 'unit_cost', 'selling_price'])
+            $this->only(['product', 'quantity', 'unit_cost', 'selling_price'])
         );
 
         // Update the Previous Sales component
@@ -60,10 +80,11 @@ class RecordSale extends Component
      */
     public function render()
     {
+        $this->calculate_cost();
 
-        $this->cost = $this->quantity * $this->unit_cost;
+        $this->products = Products::all();
 
-        $this->selling_price = "£" . Money::GBP((($this->cost) / (1 - $this->profit_margin)) + $this->shipping_cost)->getAmount();
+        $this->selling_price = "£" . Money::GBP(($this->cost / (1 - $this->profit_margin)) + $this->shipping_cost,false)->getAmount();
 
         return view('livewire.record-sale');
     }
