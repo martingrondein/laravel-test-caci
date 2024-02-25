@@ -44,6 +44,10 @@ class RecordSale extends Component
             $this->only(['quantity', 'unit_cost', 'selling_price'])
         );
 
+        // Update the Previous Sales component
+        $this->dispatch('sale-recorded');
+
+        // Reset the form
         $this->reset();
     }
 
