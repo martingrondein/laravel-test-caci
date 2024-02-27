@@ -6,36 +6,29 @@ use App\Models\Sales;
 use Livewire\Component;
 use App\Models\Products;
 use Akaunting\Money\Money;
-use Akaunting\Money\Currency;
 use Livewire\Attributes\Validate;
 
 class RecordSale extends Component
 {
     public $products = [];
 
+    #[Validate('required|numeric')]
     public $product;
 
-    #[Validate]
+    #[Validate('required|numeric')]
     public $quantity;
 
-    #[Validate]
+    #[Validate('required|numeric|between:0,999.99')]
     public $unit_cost;
 
-    public $cost;
-
+    #[Validate('required', onUpdate: true)]
     public $selling_price;
+
+    public $cost;
 
     public $profit_margin = 0.15;
 
     public $shipping_cost = 10;
-
-    public function rules()
-    {
-        return [
-            'quantity' => 'required|numeric',
-            'unit_cost' => 'required|numeric|between:0,999.99',
-        ];
-    }
 
     /**
      * Calculates the cost of the sale as the user types
@@ -44,11 +37,11 @@ class RecordSale extends Component
      */
     public function calculate_cost()
     {
-        (!is_numeric($this->quantity)) ? $this->quantity = 0 : '';
-        (!is_numeric($this->unit_cost)) ? $this->unit_cost = 0 : '';
+        // Always enforce the quantity and unit_cost to be numeric
+        (!is_numeric($this->quantity)) ? $this->quantity = 0 : $this->quantity;
+        (!is_numeric($this->unit_cost)) ? $this->unit_cost = 0 : $this->unit_cost;
 
-        $this->cost = number_format($this->quantity * $this->unit_cost,2);
-
+        $this->cost = number_format($this->quantity * $this->unit_cost, 2);
     }
 
     /**
@@ -58,11 +51,9 @@ class RecordSale extends Component
      */
     public function save()
     {
-        $this->validate();
+        $validated = $this->validate();
 
-        Sales::create(
-            $this->only(['product', 'quantity', 'unit_cost', 'selling_price'])
-        );
+        Sales::create($validated);
 
         // Update the Previous Sales component
         $this->dispatch('sale-recorded');
@@ -72,8 +63,6 @@ class RecordSale extends Component
     }
 
     /**
-     * Renders the view for recording a sale
-     *
      * Calculates the cost, selling price, and updates the view.
      *
      * @return \Illuminate\Contracts\View\View
@@ -84,7 +73,7 @@ class RecordSale extends Component
 
         $this->products = Products::all();
 
-        $this->selling_price = "£" . Money::GBP(($this->cost / (1 - $this->profit_margin)) + $this->shipping_cost,false)->getAmount();
+        $this->selling_price = "£" . Money::GBP(($this->cost / (1 - $this->profit_margin)) + $this->shipping_cost, false)->getAmount();
 
         return view('livewire.record-sale');
     }
